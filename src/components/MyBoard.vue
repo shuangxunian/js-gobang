@@ -1,56 +1,59 @@
 <template>
-  <div>
-    <!-- AI控制面板 -->
-    <div class="ai-controls" style="margin-bottom: 12px">
-      <label>
-        <input type="checkbox" v-model="aiEnabled" @change="onAIEnabledChange" />
-        AI对战
-      </label>
-      <label v-if="aiEnabled">
-        <input type="checkbox" v-model="aiFirst" />
-        AI先手
-      </label>
-      <label v-if="aiEnabled">
-        AI深度：
-        <select v-model="aiDepth">
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-      </label>
-      <button v-if="aiEnabled" @click="handleInitAIGame" :disabled="isLoading">
-        {{ isLoading ? '初始化中...' : '开始AI对战' }}
-      </button>
-    </div>
+  <div class="main-page">
+    <h1>五子棋</h1>
+    <div class="game-board">
+      <!-- AI控制面板 -->
+      <div class="ai-controls" style="margin-bottom: 12px">
+        <label>
+          <input type="checkbox" v-model="aiEnabled" @change="onAIEnabledChange" />
+          AI对战
+        </label>
+        <label v-if="aiEnabled">
+          <input type="checkbox" v-model="aiFirst" />
+          AI先手
+        </label>
+        <label v-if="aiEnabled">
+          AI深度：
+          <select v-model="aiDepth">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </label>
+        <button v-if="aiEnabled" @click="handleInitAIGame" :disabled="isLoading">
+          {{ isLoading ? '初始化中...' : '开始AI对战' }}
+        </button>
+      </div>
 
-    <div class="controls" style="margin-bottom: 12px">
-      <button @click="undoMove" :disabled="!canUndo || isLoading">悔棋</button>
-      <button @click="resetGame">重开</button>
-    </div>
+      <div class="controls" style="margin-bottom: 12px">
+        <button @click="undoMove" :disabled="!canUndo || isLoading">悔棋</button>
+        <button @click="resetGame">重开</button>
+      </div>
 
-    <div class="status" style="margin-bottom: 12px">
-      <p v-if="gameOver">
-        <template v-if="winner">
-          游戏结束，胜者：<strong>{{ winner }}</strong>
-        </template>
-        <template v-else> 平局，没有赢家 </template>
-      </p>
-      <p v-else>
-        当前玩家：<strong>{{ currentPlayer }}</strong>
-        <span v-if="aiEnabled && isLoading"> (AI思考中...)</span>
-      </p>
-    </div>
+      <div class="status" style="margin-bottom: 12px">
+        <p v-if="gameOver">
+          <template v-if="winner">
+            游戏结束，胜者：<strong>{{ winner }}</strong>
+          </template>
+          <template v-else> 平局，没有赢家 </template>
+        </p>
+        <p v-else>
+          当前玩家：<strong>{{ currentPlayer }}</strong>
+          <span v-if="aiEnabled && isLoading"> (AI思考中...)</span>
+        </p>
+      </div>
 
-    <div class="board">
-      <Cell
-        v-for="(cell, idx) in flatCells"
-        :key="idx"
-        :row="cell.row"
-        :col="cell.col"
-        :value="cell.value"
-        @select="onSelect"
-      />
+      <div class="board">
+        <Cell
+          v-for="(cell, idx) in flatCells"
+          :key="idx"
+          :row="cell.row"
+          :col="cell.col"
+          :value="cell.value"
+          @select="onSelect"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -222,6 +225,14 @@ function resetGame() {
 </script>
 
 <style scoped>
+h1 {
+  margin: 0;
+  text-align: center;
+}
+
+.main-page {
+  margin-top: 40px;
+}
 .board {
   display: grid;
   grid-template-columns: repeat(15, 30px);
