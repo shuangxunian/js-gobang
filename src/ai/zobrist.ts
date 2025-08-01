@@ -1,13 +1,20 @@
 /* global BigInt */
+type Role = 1 | -1;
+type ZobristTable = { [role: string]: bigint }[][];
+
 export default class ZobristCache {
-  constructor(size) {
+  private size: number;
+  private zobristTable: ZobristTable;
+  private hash: bigint;
+
+  constructor(size: number) {
     this.size = size;
     this.zobristTable = this.initializeZobristTable(size);
     this.hash = BigInt(0);
   }
 
-  initializeZobristTable(size) {
-    let table = [];
+  private initializeZobristTable(size: number): ZobristTable {
+    let table: ZobristTable = [];
     for (let i = 0; i < size; i++) {
       table[i] = [];
       for (let j = 0; j < size; j++) {
@@ -20,7 +27,7 @@ export default class ZobristCache {
     return table;
   }
 
-  randomBitString(length) {
+  private randomBitString(length: number): string {
     let str = "0b";
     for (let i = 0; i < length; i++) {
       str += Math.round(Math.random()).toString();
@@ -28,11 +35,11 @@ export default class ZobristCache {
     return str;
   }
 
-  togglePiece(x, y, role) {
-    this.hash ^= this.zobristTable[x][y][role];
+  togglePiece(x: number, y: number, role: Role): void {
+    this.hash ^= this.zobristTable[x][y][role.toString()];
   }
 
-  getHash() {
+  getHash(): bigint {
     return this.hash;
   }
 }

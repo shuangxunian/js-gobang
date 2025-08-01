@@ -7,6 +7,7 @@ export const patterns = {
   blockThree: new RegExp('211100|211010|210110|001112|010112|011012'),
   two: new RegExp('001100|011000|000110|010100|001010'),
 }
+
 export const shapes = {
   FIVE: 5,
   BLOCK_FIVE: 50,
@@ -34,8 +35,13 @@ export const performance = {
   total: 0,
 }
 
+type Role = 1 | -1;
+type Shape = number;
+type Board = number[][];
+type ShapeCache = { [role: number]: { [direction: number]: number[][] } };
+
 // 使用字符串匹配的方式实现的形状检测，速度较慢，但逻辑比较容易理解
-export const getShape = (board, x, y, offsetX, offsetY, role) => {
+export const getShape = (board: Board, x: number, y: number, offsetX: number, offsetY: number, role: Role): [Shape, number, number, number] => {
   const opponent = -role;
   let emptyCount = 0;
   let selfCount = 1;
@@ -73,10 +79,6 @@ export const getShape = (board, x, y, offsetX, offsetY, role) => {
       return [shapes.NONE, selfCount, opponentCount, emptyCount];
     }
   }
-  // two 类型优化结束，不需要的话可以在直接删除这一段代码不影响功能
-
-  // three类型大约占比有20%，也优化一下
-
 
   emptyCount = 0;
   selfCount = 1;
@@ -148,7 +150,16 @@ export const getShape = (board, x, y, offsetX, offsetY, role) => {
   return [shape, selfCount, opponentCount, emptyCount];
 }
 
-const countShape = (board, x, y, offsetX, offsetY, role) => {
+type CountShapeResult = {
+  selfCount: number;
+  totalLength: number;
+  noEmptySelfCount: number;
+  OneEmptySelfCount: number;
+  innerEmptyCount: number;
+  sideEmptyCount: number;
+};
+
+const countShape = (board: Board, x: number, y: number, offsetX: number, offsetY: number, role: Role): CountShapeResult => {
   const opponent = -role;
 
   let innerEmptyCount = 0; // 棋子中间的内部空位
@@ -194,7 +205,7 @@ const countShape = (board, x, y, offsetX, offsetY, role) => {
 }
 
 // 使用遍历位置的方式实现的形状检测，速度较快，大约是字符串速度的2倍 但理解起来会稍微复杂一些
-export const getShapeFast = (board, x, y, offsetX, offsetY, role) => {
+export const getShapeFast = (board: Board, x: number, y: number, offsetX: number, offsetY: number, role: Role): [Shape, number] => {
   // 有一点点优化效果：跳过为空的节点
   if (board[x + offsetX + 1][y + offsetY + 1] === 0
     && board[x - offsetX + 1][y - offsetY + 1] === 0
@@ -263,17 +274,17 @@ export const getShapeFast = (board, x, y, offsetX, offsetY, role) => {
   return [shape, selfCount];
 }
 
-export const isFive = (shape) => {
+export const isFive = (shape: Shape): boolean => {
   return shape === shapes.FIVE || shape === shapes.BLOCK_FIVE;
 };
 
-export const isFour = (shape) => {
+export const isFour = (shape: Shape): boolean => {
   return shape === shapes.FOUR || shape === shapes.BLOCK_FOUR;
 };
 
-export const getAllShapesOfPoint = (shapeCache, x, y, role) => {
+export const getAllShapesOfPoint = (shapeCache: ShapeCache, x: number, y: number, role?: Role): Shape[] => {
   const roles = role ? [role] : [1, -1];
-  const result = [];
+  const result: Shape[] = [];
   for (const r of roles) {
     for (const d of [0, 1, 2, 3]) {
       const shape = shapeCache[r][d][x][y];
