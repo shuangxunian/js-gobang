@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI測試</title>
+</head>
+<body>
+    <h1>AI功能測試</h1>
+    <div id="app">
+        <button onclick="testAI()">測試AI</button>
+        <div id="result"></div>
+    </div>
+
+    <script type="module">
+        import { start, move, undo, end } from './utils/bridge.js';
+
+        window.testAI = async function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '測試中...';
+            
+            try {
+                console.log('開始測試AI...');
+                const result = await start(15, false, 2);
+                console.log('AI初始化成功:', result);
+                resultDiv.innerHTML = 'AI初始化成功！<br>棋盤狀態: ' + JSON.stringify(result.board);
+            } catch (error) {
+                console.error('AI測試失敗:', error);
+                resultDiv.innerHTML = 'AI測試失敗: ' + error.message;
+            }
+        };
+    </script>
+</body>
+</html> 
