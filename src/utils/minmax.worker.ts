@@ -1,11 +1,24 @@
-import Board from '../ai/board.js';
-import { minmax } from '../ai/minmax.js';
-import { board_size } from '../ai/config.js';
+import Board from '../ai/board.ts';
+import { minmax } from '../ai/minmax.ts';
+import { board_size } from '../ai/config.ts';
+import type { AIGameState } from '@/composables/useAI';
 
-// @ts-ignore
-onmessage = function (event) {
+interface WorkerMessage {
+  action: 'start' | 'move' | 'undo' | 'end';
+  payload?: any;
+}
+
+interface WorkerResponse {
+  action: string;
+  payload: any;
+}
+
+type Role = 1 | -1;
+type Move = [number, number];
+
+onmessage = function (event: MessageEvent<WorkerMessage>) {
   const { action, payload } = event.data;
-  let res = null;
+  let res: any = null;
   switch (action) {
     case 'start':
       res = start(payload.board_size, payload.aiFirst, payload.depth);
@@ -25,13 +38,15 @@ onmessage = function (event) {
   postMessage({
     action,
     payload: res,
-  });
+  } as WorkerResponse);
 };
 
 let board = new Board(board_size);
-let score = 0, bestPath = [], currentDepth = 0;
+let score = 0;
+let bestPath: Move[] = [];
+let currentDepth = 0;
 
-const getBoardData = () => {
+const getBoardData = (): AIGameState => {
   return {
     board: JSON.parse(JSON.stringify(board.board)),
     winner: board.getWinner(),
@@ -41,18 +56,20 @@ const getBoardData = () => {
     score,
     bestPath,
     currentDepth,
-  }
-}
+  };
+};
 
-export const start = (board_size, aiFirst = true, depth = 4) => {
+export const start = (board_size: number, aiFirst = true, depth = 4): AIGameState => {
   console.log('start', board_size, aiFirst, depth);
   board = new Board(board_size);
   try {
     if (aiFirst) {
       const res = minmax(board, board.role, depth);
-      let move;
-      [score, move, bestPath, currentDepth] = res;
-      board.put(move[0], move[1]);
+      let move: Move | null;
+      [score, move, bestPath] = res;
+      if (move) {
+        board.put(move[0], move[1]);
+      }
     }
   } catch (e) {
     console.log(e);
@@ -60,7 +77,7 @@ export const start = (board_size, aiFirst = true, depth = 4) => {
   return getBoardData();
 };
 
-export const move = (position, depth) => {
+export const move = (position: Move, depth: number): AIGameState => {
   try {
     board.put(position[0], position[1]);
   } catch (e) {
@@ -68,20 +85,22 @@ export const move = (position, depth) => {
   }
   if (!board.isGameOver()) {
     const res = minmax(board, board.role, depth);
-    let move;
-    [score, move, bestPath, currentDepth] = res;
-    board.put(move[0], move[1]);
+    let move: Move | null;
+    [score, move, bestPath] = res;
+    if (move) {
+      board.put(move[0], move[1]);
+    }
   }
   return getBoardData();
 };
 
-export const end = () => {
+export const end = (): AIGameState => {
   // do nothing
   return getBoardData();
 };
 
-export const undo = () => {
+export const undo = (): AIGameState => {
   board.undo();
   board.undo();
   return getBoardData();
-}
+}; 

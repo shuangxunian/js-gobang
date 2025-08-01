@@ -39,7 +39,8 @@ export function useAI() {
     
     isLoading.value = true
     try {
-      const result = await move(position, aiDepth.value)
+      const positionNumber = position[0] * 15 + position[1]
+      const result = await move(positionNumber, aiDepth.value)
       gameState.value = result
       return result
     } catch (error) {

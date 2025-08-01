@@ -3,11 +3,11 @@
     <!-- AI控制面板 -->
     <div class="ai-controls" style="margin-bottom: 12px">
       <label>
-        <input type="checkbox" v-model="aiEnabled" @change="onAIEnabledChange">
-        AI對戰
+        <input type="checkbox" v-model="aiEnabled" @change="onAIEnabledChange" />
+        AI对战
       </label>
       <label v-if="aiEnabled">
-        <input type="checkbox" v-model="aiFirst">
+        <input type="checkbox" v-model="aiFirst" />
         AI先手
       </label>
       <label v-if="aiEnabled">
@@ -20,7 +20,7 @@
         </select>
       </label>
       <button v-if="aiEnabled" @click="handleInitAIGame" :disabled="isLoading">
-        {{ isLoading ? '初始化中...' : '開始AI對戰' }}
+        {{ isLoading ? '初始化中...' : '开始AI对战' }}
       </button>
     </div>
 
@@ -56,9 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRefHistory } from '@vueuse/core'
-import Cell from './Cell.vue'
+import Cell from './MyCell.vue'
 import { checkWin } from '@/utils/checkWin'
 import { useAI } from '@/composables/useAI'
 
@@ -77,7 +77,6 @@ const {
   undoAIMove,
   endAIGame,
   convertAIBoardToVue,
-  convertVueBoardToAI
 } = useAI()
 
 // 棋盘状态，响应式二维数组
@@ -158,7 +157,7 @@ async function onSelect(row: number, col: number) {
       // 同步AI棋盤到Vue棋盤
       board.value = convertAIBoardToVue(result.board)
       currentPlayer.value = 'black'
-      
+
       if (result.winner !== 0) {
         gameOver.value = true
         winner.value = result.winner === 1 ? 'black' : 'white'
@@ -187,7 +186,7 @@ async function undoMove() {
         moveHistory.value.push({
           row: move[0],
           col: move[1],
-          player: move[2] === 1 ? 'black' : 'white'
+          player: move[2] === 1 ? 'black' : 'white',
         })
       }
     }
@@ -215,7 +214,7 @@ function resetGame() {
   currentPlayer.value = 'black'
   gameOver.value = false
   winner.value = null
-  
+
   if (aiEnabled.value) {
     endAIGame()
   }

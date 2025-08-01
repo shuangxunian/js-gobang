@@ -5,9 +5,12 @@
 </template>
 
 <script setup lang="ts">
-import Board from './components/Board.vue';
+import Board from './components/MyBoard.vue'
 </script>
 
 <style>
-body { font-family: sans-serif; padding: 20px; }
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
 </style>
