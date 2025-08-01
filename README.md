@@ -1,39 +1,24 @@
-# gobang-vue3-ts
+# 五子棋AI
 
-This template should help get you started developing with Vue 3 in Vite.
+## 简介
 
-## Recommended IDE Setup
+本项目是一个五子棋，技术栈为vue3 + ts + elementUI Plus，基于Minimax算法和Alpha-Beta剪枝。AI可以与人类玩家对战，也可以与另一个AI对战。
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 功能
 
-## Type Support for `.vue` Imports in TS
+- 与人类玩家对战
+- 与另一个AI对战
+- 显示游戏结果
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## 使用方法
 
-## Customize configuration
+## AI算法
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## 参考
 
-## Project Setup
+本项目大量参考[五子棋AI](https://github.com/lihongxun945/gobang)这个项目，用vue3重写一遍的原因为：
 
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+1. 熟悉一遍AI逻辑，练练vue3和ts；
+2. 后续需要用electron封装，以及将AI移到express上作为一个五子棋AI服务；
+3. 封装后将开始新的基于PPO或者其它模型的强化学习五子棋AI，此项目作为其陪练；
+4. 模型趋于收敛后，将往六子棋上面扩充。
