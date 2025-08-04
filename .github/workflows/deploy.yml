@@ -1,0 +1,46 @@
+name: 自動部署 GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 安裝 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: 安裝依赖
+        run: npm ci
+
+      - name: 运行构建
+        run: npm run build
+
+      - name: 上傳打包結果为 pages artifact
+        id: deploy-artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-artifact.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        uses: actions/deploy-pages@v4
