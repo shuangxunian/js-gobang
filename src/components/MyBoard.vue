@@ -77,6 +77,8 @@ const {
   aiDepth,
   initAIGame,
   makeAIMove,
+  makeAIOnlyMove,
+  syncPlayerMove,
   undoAIMove,
   endAIGame,
   convertAIBoardToVue,
@@ -121,6 +123,10 @@ const handleInitAIGame = async () => {
       gameOver.value = true
       winner.value = gameState.value.winner === 1 ? 'black' : 'white'
     }
+  } else if (!aiFirst.value && gameState.value) {
+    // 如果玩家先手，同步AI棋盤到Vue棋盤
+    board.value = convertAIBoardToVue(gameState.value.board)
+    currentPlayer.value = 'black'
   }
 }
 
@@ -131,6 +137,11 @@ async function onSelect(row: number, col: number) {
   // 玩家下棋
   board.value[row][col] = currentPlayer.value
   moveHistory.value.push({ row, col, player: currentPlayer.value })
+
+  // 如果啟用AI，同步玩家下棋到AI棋盤
+  if (aiEnabled.value) {
+    await syncPlayerMove([row, col])
+  }
 
   // 检查胜负
   if (checkWin(board.value, row, col, currentPlayer.value, 5, false)) {
@@ -155,7 +166,7 @@ async function onSelect(row: number, col: number) {
 
   // 如果啟用AI且輪到AI下棋
   if (aiEnabled.value && currentPlayer.value === 'white') {
-    const result = await makeAIMove([row, col])
+    const result = await makeAIOnlyMove()
     if (result) {
       // 同步AI棋盤到Vue棋盤
       board.value = convertAIBoardToVue(result.board)

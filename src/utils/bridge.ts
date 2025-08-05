@@ -1,7 +1,7 @@
 import type { AIGameState } from '@/composables/useAI';
 
 interface WorkerMessage {
-  action: 'start' | 'move' | 'undo' | 'end';
+  action: 'start' | 'move' | 'undo' | 'end' | 'aiMove';
   payload?: any;
 }
 
@@ -45,6 +45,24 @@ export const move = async (position: number, depth: number): Promise<AIGameState
     worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       const { action, payload } = event.data;
       if (action === 'move') {
+        resolve(payload);
+      }
+    };
+  });
+};
+
+export const aiMove = async (depth: number): Promise<AIGameState> => {
+  return new Promise((resolve, reject) => {
+    worker.postMessage({
+      action: 'aiMove',
+      payload: {
+        depth,
+      },
+    } as WorkerMessage);
+    
+    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+      const { action, payload } = event.data;
+      if (action === 'aiMove') {
         resolve(payload);
       }
     };

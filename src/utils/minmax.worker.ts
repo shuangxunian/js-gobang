@@ -4,7 +4,7 @@ import { board_size } from '../ai/config.ts';
 import type { AIGameState } from '@/composables/useAI';
 
 interface WorkerMessage {
-  action: 'start' | 'move' | 'undo' | 'end';
+  action: 'start' | 'move' | 'undo' | 'end' | 'aiMove';
   payload?: any;
 }
 
@@ -25,6 +25,9 @@ onmessage = function (event: MessageEvent<WorkerMessage>) {
       break;
     case 'move':
       res = move(payload.position, payload.depth);
+      break;
+    case 'aiMove':
+      res = aiMove(payload.depth);
       break;
     case 'undo':
       res = undo();
@@ -83,6 +86,10 @@ export const move = (position: Move, depth: number): AIGameState => {
   } catch (e) {
     console.log(e);
   }
+  return getBoardData();
+};
+
+export const aiMove = (depth: number): AIGameState => {
   if (!board.isGameOver()) {
     const res = minmax(board, board.role, depth);
     let move: Move | null;

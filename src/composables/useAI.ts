@@ -1,5 +1,5 @@
 import { ref, reactive } from 'vue'
-import { start, move, undo, end } from '@/utils/bridge'
+import { start, move, undo, end, aiMove } from '@/utils/bridge'
 
 export interface AIGameState {
   board: number[][]
@@ -48,6 +48,38 @@ export function useAI() {
       return null
     } finally {
       isLoading.value = false
+    }
+  }
+
+  // AI單獨下棋
+  const makeAIOnlyMove = async () => {
+    if (!aiEnabled.value || !gameState.value) return null
+    
+    isLoading.value = true
+    try {
+      const result = await aiMove(aiDepth.value)
+      gameState.value = result
+      return result
+    } catch (error) {
+      console.error('AI下棋失敗:', error)
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // 同步玩家下棋到AI棋盤
+  const syncPlayerMove = async (position: [number, number]) => {
+    if (!aiEnabled.value || !gameState.value) return null
+    
+    try {
+      const positionNumber = position[0] * 15 + position[1]
+      const result = await move(positionNumber, aiDepth.value)
+      gameState.value = result
+      return result
+    } catch (error) {
+      console.error('同步玩家下棋失敗:', error)
+      return null
     }
   }
 
@@ -111,6 +143,8 @@ export function useAI() {
     aiDepth,
     initAIGame,
     makeAIMove,
+    makeAIOnlyMove,
+    syncPlayerMove,
     undoAIMove,
     endAIGame,
     convertAIBoardToVue,
