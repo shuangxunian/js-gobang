@@ -1,5 +1,5 @@
 import { ref, reactive } from 'vue'
-import { start, move, undo, end, aiMove } from '@/utils/bridge'
+import { start, move, undo, end, aiMove, encodeIndex } from '@/utils/bridge'
 
 export interface AIGameState {
   board: number[][]
@@ -36,50 +36,43 @@ export function useAI() {
   // AI下棋
   const makeAIMove = async (position: [number, number]) => {
     if (!aiEnabled.value || !gameState.value) return null
-    
     isLoading.value = true
     try {
-      const positionNumber = position[0] * 15 + position[1]
-      const result = await move(positionNumber, aiDepth.value)
+      // ✅ 直接传坐标
+      const result = await move([position[0], position[1]], aiDepth.value)
       gameState.value = result
       return result
-    } catch (error) {
-      console.error('AI下棋失敗:', error)
-      return null
     } finally {
       isLoading.value = false
     }
   }
 
-  // AI單獨下棋
   const makeAIOnlyMove = async () => {
     if (!aiEnabled.value || !gameState.value) return null
-    
     isLoading.value = true
     try {
       const result = await aiMove(aiDepth.value)
       gameState.value = result
       return result
-    } catch (error) {
-      console.error('AI下棋失敗:', error)
+    } catch (e) {
+      console.error('AI下棋失敗:', e)
       return null
     } finally {
       isLoading.value = false
     }
   }
 
-  // 同步玩家下棋到AI棋盤
+  // 同步玩家下棋到AI棋盘
   const syncPlayerMove = async (position: [number, number]) => {
     if (!aiEnabled.value || !gameState.value) return null
-    
+    isLoading.value = true
     try {
-      const positionNumber = position[0] * 15 + position[1]
-      const result = await move(positionNumber, aiDepth.value)
+      // ✅ 直接传坐标
+      const result = await move([position[0], position[1]], aiDepth.value)
       gameState.value = result
       return result
-    } catch (error) {
-      console.error('同步玩家下棋失敗:', error)
-      return null
+    } finally {
+      isLoading.value = false
     }
   }
 

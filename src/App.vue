@@ -16,9 +16,9 @@ body,
   padding: 0;
   margin: 0;
 }
-#app {
+/* #app {
   display: flex;
   justify-content: center;
-  /* align-items: center; */
-}
+  align-items: center;
+} */
 </style>
