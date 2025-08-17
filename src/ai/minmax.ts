@@ -152,7 +152,7 @@ export const minmax = (
     if (value >= FIVE) {
       return [value, move, bestPath]
     }
-    ;[value, move, bestPath] = _minmax(board, role, depth)
+    [value, move, bestPath] = _minmax(board, role, depth)
     board.put(move![0], move![1], role)
     const [value2, move2, bestPath2] = vct(board.reverse(), role, vctDepth)
     board.undo()

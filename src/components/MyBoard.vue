@@ -2,50 +2,28 @@
   <div class="main-page">
     <p class="board-title">五子棋</p>
     <div class="game-board">
-      <el-button type="primary" plain @click="dialogTableVisible = true">开始游戏</el-button>
-      <!-- AI控制面板 -->
-      <!-- <div class="ai-controls" style="margin-bottom: 12px">
-        <label>
-          <input type="checkbox" v-model="aiEnabled" @change="onAIEnabledChange" />
-          AI对战
-        </label>
-        <label v-if="aiEnabled">
-          <input type="checkbox" v-model="aiFirst" />
-          AI先手
-        </label>
-        <label v-if="aiEnabled">
-          AI深度：
-          <select v-model="aiDepth">
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-        </label>
-        <button v-if="aiEnabled" @click="handleInitAIGame" :disabled="isLoading">
-          {{ isLoading ? '初始化中...' : '开始AI对战' }}
-        </button>
+      <el-button v-if="!hasAnyStone" type="primary" plain @click="dialogTableVisible = true">开始游戏</el-button>
+      <div v-if="hasAnyStone" class="options">
+        <div class="controls" style="margin-bottom: 12px">
+          <el-button @click="undoMove" :disabled="!canUndo || isLoading">悔棋</el-button>
+          <el-button @click="resetGame">重开</el-button>
+        </div>
+
+        <div class="status" style="margin-bottom: 12px">
+          <p v-if="gameOver">
+            <template v-if="winner">
+              游戏结束，胜者：<strong>{{ winner }}</strong>
+            </template>
+            <template v-else> 平局，没有赢家 </template>
+          </p>
+          <p v-else>
+            当前玩家：<strong>{{ currentPlayer }}</strong>
+            <span v-if="aiEnabled && isLoading"> (AI思考中...)</span>
+          </p>
+        </div>
       </div>
 
-      <div class="controls" style="margin-bottom: 12px">
-        <button @click="undoMove" :disabled="!canUndo || isLoading">悔棋</button>
-        <button @click="resetGame">重开</button>
-      </div>
-
-      <div class="status" style="margin-bottom: 12px">
-        <p v-if="gameOver">
-          <template v-if="winner">
-            游戏结束，胜者：<strong>{{ winner }}</strong>
-          </template>
-          <template v-else> 平局，没有赢家 </template>
-        </p>
-        <p v-else>
-          当前玩家：<strong>{{ currentPlayer }}</strong>
-          <span v-if="aiEnabled && isLoading"> (AI思考中...)</span>
-        </p>
-      </div> -->
-
-      <div class="board" :class="{ disabled: aiEnabled && turn !== 'human' || isLoading }">
+      <div v-loading="isLoading" class="board">
         <Cell
           v-for="(cell, idx) in flatCells"
           :key="idx"
@@ -120,7 +98,7 @@ const { undo, clear, canUndo } = useRefHistory(board, { deep: true })
 // 只用于非AI模式恢复先后手；AI模式下我们用 turn 计算
 const moveHistory = ref<{ row: number; col: number; player: CellState }[]>([])
 
-const options = ref([{ value: 2, label: '2' }, { value: 3, label: '3' }, { value: 4, label: '4' }, { value: 5, label: '5' }])
+const options = ref([{ value: 2, label: '2' }, { value: 4, label: '3' }, { value: 6, label: '4' }])
 
 // 动态角色颜色：AI 先手 -> AI=black，人=white；否则相反
 const AI_COLOR = computed<'black' | 'white'>(() => (aiFirst.value ? 'black' : 'white'))
@@ -144,6 +122,9 @@ watch(turn, async (nv, ov) => {
   }
 })
 
+const hasAnyStone = computed(() =>
+  board.value.some(row => row.some(cell => cell !== null))
+)
 
 // 渲染数据
 const flatCells = computed(() =>

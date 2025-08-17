@@ -16,7 +16,7 @@ const worker = new Worker(new URL('./minmax.worker.ts', import.meta.url), { type
 
 let CURRENT_SIZE = 15
 
-function callWorker<T>(msg: WorkerMessage, expect: Action, timeoutMs = 30000): Promise<T> {
+function callWorker<T>(msg: WorkerMessage, expect: Action, timeoutMs = 300000): Promise<T> {
   return new Promise((resolve, reject) => {
     const handler = (event: MessageEvent<WorkerResponse>) => {
       const { action, payload } = event.data || {}
